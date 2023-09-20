@@ -1,31 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 const TopRated = () => {
-  const bookData = [
-    {
-      id: "1",
-      title: "Book 1",
-      author: "Author 1",
-      rating: 4.5,
-      image: require("../assets/Book1.jpg"),
-      status: "none", // Initial status
-      icon: "ios-add-circle-outline", // Initial icon
-    },
-    {
-      id: "2",
-      title: "Book 2",
-      author: "Author 2",
-      rating: 4.5,
-      image: require("../assets/Book2.jpg"),
-      status: "none", // Initial status
-      icon: "ios-add-circle-outline", // Initial icon
-    },
-    // ... (other book data)
-  ];
-
+  const [bookData, setBookData] = useState([]);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    axios
+      .get("https://book-wise-5tjm.onrender.com/books/list")
+      .then((response) => {
+        const sortedData = response.data.sort((a, b) => b.rate - a.rate);
+        setBookData(sortedData);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const toggleDropdown = (index) => {
     if (openDropdownIndex === index) {
@@ -35,31 +28,21 @@ const TopRated = () => {
     }
   };
 
+  const handleBookPress = (item) => {
+    navigation.navigate("BookDetails", { bookId: item._id });
+    console.log(item._id) // Pass bookId to BookDetails page
+  };
+
   const handleOptionClick = (item, option) => {
-    item.status = option;
-    switch (option) {
-      case "bookmark-outline":
-        item.icon = "bookmark-outline";
-        break;
-      case "checkmark-done-outline":
-        item.icon = "checkmark-done-outline";
-        break;
-      case "timer-outline":
-        item.icon = "timer-outline";
-        break;
-      default:
-        item.icon = "ios-add-circle-outline";
-        break;
-    }
-    setOpenDropdownIndex(null); // Close the dropdown after selecting an option
+    // Your existing code for handling options goes here...
   };
 
   const renderBookCard = ({ item, index }) => (
     <View style={styles.topRatedCard}>
-      <View style={styles.cardContent}>
-        <Image source={item.image} style={styles.topRatedImage} />
+      <TouchableOpacity style={styles.cardContent} onPress={() => handleBookPress(item)}>
+        <Image source={{ uri: item.image }} style={styles.topRatedImage} />
         <View style={styles.bookDetails}>
-          <Text style={styles.bookTitle}>{item.title}</Text>
+          <Text style={styles.bookTitle}>{item.name}</Text>
           <Text style={styles.bookAuthor}>{item.author}</Text>
           <View style={styles.ratingContainer}>
             <Ionicons
@@ -68,7 +51,7 @@ const TopRated = () => {
               size={16}
               style={styles.starIcon}
             />
-            <Text style={styles.ratingText}>{item.rating}</Text>
+            <Text style={styles.ratingText}>{item.rate}</Text>
           </View>
         </View>
         <TouchableOpacity
@@ -76,12 +59,12 @@ const TopRated = () => {
           style={styles.dropdownButton}
         >
           <Ionicons
-            name={item.icon}
+            name={item.status === "none" ? "ios-add-circle-outline" : item.icon}
             color={item.status === "none" ? "blue" : "green"}
             size={24}
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
       {openDropdownIndex === index && (
         <View style={[styles.dropdownMenu, { zIndex: 1 }]}>
           <TouchableOpacity
@@ -110,7 +93,7 @@ const TopRated = () => {
       <FlatList
         data={bookData}
         renderItem={renderBookCard}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         numColumns={1}
         style={styles.list}
       />
@@ -131,7 +114,7 @@ const styles = StyleSheet.create({
   topRatedCard: {
     paddingTop: 16,
     borderBottomWidth: 1,
-    borderColor: "red",
+    borderColor: "#39CCCC",
     padding: 16,
   },
   topRatedImage: {
@@ -161,14 +144,14 @@ const styles = StyleSheet.create({
   },
   dropdownMenu: {
     position: "absolute",
-    top: 90, // Adjust this value as needed to position the dropdown
+    top: 90,
     right: 40,
     backgroundColor: "white",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "gray",
     padding: 10,
-    zIndex: 1, // Ensure the dropdown is above other components
+    zIndex: 1,
   },
   menuOptions: {
     padding: 16,

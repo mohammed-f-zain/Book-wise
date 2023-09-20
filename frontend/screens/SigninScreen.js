@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useUser } from "../contex/UserContext";
 import {
   StyleSheet,
   Text,
@@ -10,7 +11,9 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
+
 const SigninScreen = () => {
+  const { setToken, setUserId, token, userId } = useUser();
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,11 +40,43 @@ const SigninScreen = () => {
     return true;
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (validateEmail() && validatePassword()) {
-      // Perform the sign-in logic here
-      navigation.navigate("MainTabs");
-      setEmail("");
+      try {
+        const response = await fetch(
+          "https://book-wise-5tjm.onrender.com/user/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const { token, userId } = data; // Assuming your API returns token and id
+
+          // Store token and id in context
+          setToken(token);
+          setUserId(userId);
+
+          // Sign in was successful, you can handle this accordingly.
+          // For example, you can navigate to the main screen.
+          navigation.navigate("MainTabs");
+          setEmail("");
+          console.log(token)
+          console.log(userId)
+        } else {
+          // Handle sign-in error, such as displaying an error message.
+          setPasswordError("Email or Password Not Correct");
+          // You might want to display an error message here.
+        }
+      } catch (error) {
+        console.error("Error signing in:", error);
+        // Handle other errors here.
+      }
     }
   };
 

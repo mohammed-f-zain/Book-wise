@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios"
+import axios from "axios";
 
 const Signup = () => {
   const navigation = useNavigation();
@@ -72,21 +72,24 @@ const Signup = () => {
       validateConfirmPassword()
     ) {
       try {
-        const response = await axios.post('http://127.0.0.1:8080/user/register', {
-          name,
-          email,
-          password,
-          dateOfBirth: '', // Add date of birth and country if needed
-          country: '',
-        });
-  
+        const response = await axios.post(
+          "https://book-wise-5tjm.onrender.com/user/register",
+          {
+            name,
+            email,
+            password,
+            dateOfBirth: "", // Add date of birth and country if needed
+            country: "",
+          }
+        );
+
         if (response.status === 201) {
           // Registration was successful, you can navigate to the HomeScreen or display a success message
-          navigation.navigate('HomeScreen');
-          setName('');
-          setEmail('');
-          setPassword('');
-          setConfirmPassword('');
+          navigation.navigate("MainTabs");
+          setName("");
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
         } else {
           // Handle registration error (e.g., display an error message)
           // You can access the error message in response.data.message
@@ -94,7 +97,7 @@ const Signup = () => {
         }
       } catch (error) {
         // Handle network or server errors
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     }
   };

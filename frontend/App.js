@@ -10,7 +10,11 @@ import HomeScreen from "./screens/HomeScreen";
 import SearchPage from "./screens/SearchPage";
 import FavPage from "./screens/FavPage";
 import ProfilePage from "./screens/ProfilePage";
-import TopRated from "./screens/TopRated"
+import TopRated from "./screens/TopRated";
+import BookDetails from "./screens/BookDetails";
+import CategoryBooksScreen from "./screens/CategoryBooksScreen";
+import { UserProvider } from "./contex/UserContext";
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -30,7 +34,7 @@ const MainTabs = () => {
             iconName = focused ? "heart" : "heart-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
-          }else if (route.name === "Trending") {
+          } else if (route.name === "Trending") {
             iconName = focused ? "trending-up" : "trending-up-outline";
           }
 
@@ -38,8 +42,8 @@ const MainTabs = () => {
         },
         tabBarActiveTintColor: "#FFB800", // Active tab color
         tabBarInactiveTintColor: "#39CCCC", // Inactive tab color
-        tabBarLabelStyle:null, 
-        headerShown:false,
+        tabBarLabelStyle: null,
+        headerShown: false,
         // Tab label style
       })}
     >
@@ -54,19 +58,23 @@ const MainTabs = () => {
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="FirstPage" headerMode="none">
-        <Stack.Screen name="FirstPage" component={FirstPage} />
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="SigninScreen" component={SigninScreen} />
-        <Stack.Screen name="SearchPage" component={SearchPage} />
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="FavPage" component={FavPage} />
-        <Stack.Screen name="ProfilePage" component={ProfilePage} />
-        <Stack.Screen name="TopRated" component={TopRated} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="FirstPage" headerMode="none">
+          <Stack.Screen name="FirstPage" component={FirstPage} />
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="SigninScreen" component={SigninScreen} />
+          <Stack.Screen name="SearchPage" component={SearchPage} />
+          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen name="FavPage" component={FavPage} />
+          <Stack.Screen name="ProfilePage" component={ProfilePage} />
+          <Stack.Screen name="TopRated" component={TopRated} />
+          <Stack.Screen name="BookDetails" component={BookDetails} />
+          <Stack.Screen name="CategoryBooks" component={CategoryBooksScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
   );
 };
 

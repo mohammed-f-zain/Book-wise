@@ -1,90 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-const bookData = [
-  {
-    id: "1",
-    title: "saeed",
-    rating: 4.5,
-    image: require("../assets/Book1.jpg"),
-  },
-  {
-    id: "2",
-    title: "Book 2",
-    rating: 4.5,
-    image: require("../assets/Book2.jpg"),
-  },
-  {
-    id: "3",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book3.jpg"),
-  },
-  {
-    id: "4",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book1.jpg"),
-  },
-  {
-    id: "5",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book2.jpg"),
-  },
-  {
-    id: "6",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book3.jpg"),
-  },
-  {
-    id: "7",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book1.jpg"),
-  },
-  {
-    id: "8",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book2.jpg"),
-  },
-  {
-    id: "9",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book3.jpg"),
-  },
-  {
-    id: "10",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book1.jpg"),
-  },
-  {
-    id: "11",
-    title: "Book 1",
-    rating: 4.5,
-    image: require("../assets/Book2.jpg"),
-  },
-  {
-    id: "12",
-    title: "Book 1",
-    rating: 6,
-    image: require("../assets/Book3.jpg"),
-  },
-
-];
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, Image, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredBooks, setFilteredBooks] = useState(bookData);
+  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [allBooks, setAllBooks] = useState([]); // State to store all books
+
+  useEffect(() => {
+    // Fetch all books from the API endpoint using Axios
+    axios
+      .get("https://book-wise-5tjm.onrender.com/books/list")
+      .then((response) => {
+        setAllBooks(response.data);
+        // Initially, set filteredBooks to all books
+        setFilteredBooks(response.data);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const handleSearch = (text) => {
-    const filtered = bookData.filter((book) =>
-      book.title.toLowerCase().includes(text.toLowerCase())
+    const filtered = allBooks.filter((book) =>
+      book.name.toLowerCase().includes(text.toLowerCase())
     );
     setSearchQuery(text);
     setFilteredBooks(filtered);
@@ -92,7 +30,7 @@ const SearchPage = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.topRatedCard}>
-      <Image source={item.image} style={styles.topRatedImage} />
+      <Image source={{ uri: item.image }} style={styles.topRatedImage} />
       <View style={styles.ratingContainer}>
         <Ionicons
           name="star"
@@ -100,7 +38,7 @@ const SearchPage = () => {
           size={16}
           style={styles.starIcon}
         />
-        <Text style={styles.ratingText}>{item.rating}</Text>
+        <Text style={styles.ratingText}>{item.rate}</Text>
       </View>
     </View>
   );
@@ -118,7 +56,7 @@ const SearchPage = () => {
           <TouchableOpacity
             onPress={() => {
               setSearchQuery('');
-              setFilteredBooks(bookData);
+              setFilteredBooks(allBooks); // Reset to all books when clearing search
             }}
           >
             <Ionicons
@@ -133,7 +71,7 @@ const SearchPage = () => {
       <FlatList
         data={filteredBooks}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         numColumns={2}
         style={styles.list}
       />
@@ -145,7 +83,7 @@ const styles = StyleSheet.create({
   TopPage: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#ffff',
     marginTop:50,
   },
   searchContainer: {
@@ -183,11 +121,11 @@ const styles = StyleSheet.create({
   topRatedImage: {
     width: '100%',
     height: '100%',
-    objectFit: 'fit',
+    objectFit:"fill"
   },
   ratingContainer: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     backgroundColor: 'black',
     paddingVertical: 5,

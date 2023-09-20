@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,16 +7,44 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+
+  // State to store top-rated books
+  const [topRatedBooks, setTopRatedBooks] = useState([]);
+
+  useEffect(() => {
+    // Fetch top-rated books when the component mounts
+    const fetchTopRatedBooks = async () => {
+      try {
+        const response = await axios.get(
+          "https://book-wise-5tjm.onrender.com/books/list"
+        );
+        // Assuming the response data is an array of top-rated books
+        setTopRatedBooks(response.data);
+      } catch (error) {
+        console.error("Error fetching top-rated books: ", error);
+      }
+    };
+
+    fetchTopRatedBooks();
+  }, []);
+
+  const handleCategoryPress = (categoryName) => {
+    navigation.navigate("CategoryBooks", { category: categoryName });
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.welcome_container}>
         <Text style={styles.welcome}>Hi Saeed</Text>
         <Text style={styles.enjoy}>Enjoy Your Reading Today</Text>
       </View>
+
       {/* Categories Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Categories</Text>
@@ -25,57 +54,65 @@ const HomeScreen = () => {
           contentContainerStyle={styles.categoryContainer}
         >
           {/* Category Card 1 */}
-          <View style={styles.categoryCard}>
+          <TouchableOpacity
+            style={styles.categoryCard}
+            onPress={() => handleCategoryPress("Comedy")}
+          >
             <Image
               source={require("../assets/Comedy.png")}
               style={styles.categoryImage}
             />
             <Text style={styles.categoryTitle}>Comedy</Text>
-          </View>
+          </TouchableOpacity>
 
           {/* Category Card 2 */}
-          <View style={styles.categoryCard}>
+          <TouchableOpacity style={styles.categoryCard}  onPress={() => handleCategoryPress("Thriller")}>
             <Image
               source={require("../assets/Mystery.png")}
               style={styles.categoryImage}
+             
             />
             <Text style={styles.categoryTitle}>Thriller</Text>
-          </View>
-          <View style={styles.categoryCard}>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.categoryCard}  onPress={() => handleCategoryPress("Romance")}>
             <Image
               source={require("../assets/Romance.png")}
               style={styles.categoryImage}
             />
             <Text style={styles.categoryTitle}>Romance</Text>
-          </View>
-          <View style={styles.categoryCard}>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Biography")}>
             <Image
               source={require("../assets/Biography.png")}
               style={styles.categoryImage}
             />
             <Text style={styles.categoryTitle}>Biography</Text>
-          </View>
-          <View style={styles.categoryCard}>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Historical")} >
             <Image
               source={require("../assets/Historical.png")}
               style={styles.categoryImage}
             />
             <Text style={styles.categoryTitle}>Historical</Text>
-          </View>
-          <View style={styles.categoryCard}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Motivation")}>
             <Image
               source={require("../assets/Self-confident.png")}
               style={styles.categoryImage}
             />
             <Text style={styles.categoryTitle}>Motivation</Text>
-          </View>
-          <View style={styles.categoryCard}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Kids")}>
             <Image
               source={require("../assets/kids.png")}
               style={styles.categoryImage}
             />
             <Text style={styles.categoryTitle}>Kids</Text>
-          </View>
+          </TouchableOpacity>
           {/* Add more Category Cards as needed */}
         </ScrollView>
       </View>
@@ -101,134 +138,88 @@ const HomeScreen = () => {
             />
             <Text style={styles.authorName}>Author 1</Text>
           </View>
-
           <View style={styles.authorCard}>
             <Image
               source={require("../assets/AgathaChristie.jpg")}
               style={styles.authorImage}
             />
-            <Text style={styles.authorName}>Author 2</Text>
+            <Text style={styles.authorName}>Author 1</Text>
           </View>
-
           <View style={styles.authorCard}>
             <Image
               source={require("../assets/AgathaChristie.jpg")}
               style={styles.authorImage}
             />
-            <Text style={styles.authorName}>Author 3</Text>
+            <Text style={styles.authorName}>Author 1</Text>
           </View>
-
           <View style={styles.authorCard}>
             <Image
               source={require("../assets/AgathaChristie.jpg")}
               style={styles.authorImage}
             />
-            <Text style={styles.authorName}>Author 4</Text>
+            <Text style={styles.authorName}>Author 1</Text>
           </View>
+
+          {/* Add more Author Cards as needed */}
         </ScrollView>
       </View>
+
       {/* Top Rated Section */}
       <View style={styles.section}>
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Top Rated</Text>
-          <TouchableOpacity style={styles.seeMoreButton}>
+          <TouchableOpacity
+            style={styles.seeMoreButton}
+            onPress={() => navigation.navigate("TopRated")}
+          >
             <Text style={styles.seeMoreText}>See More ...</Text>
           </TouchableOpacity>
         </View>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.topRatedContainer}
         >
-          {/* Top Rated Card 1 */}
-          <View style={styles.topRatedCard}>
-            <Image
-              source={require("../assets/Book1.jpg")}
-              style={styles.topRatedImage}
-            />
-            <View style={styles.ratingContainer}>
-              <Ionicons
-                name="star"
-                color={"gold"}
-                size={16}
-                style={styles.starIcon}
+          {topRatedBooks.map((book, index) => (
+            <View style={styles.topRatedCard} key={index}>
+              <Image
+                source={{ uri: book.image }} // Use the book's image URL
+                style={styles.topRatedImage}
               />
-              <Text style={styles.ratingText}>4.5</Text>
+              <View style={styles.ratingContainer}>
+                <Ionicons
+                  name="star"
+                  color={"gold"}
+                  size={16}
+                  style={styles.starIcon}
+                />
+                <Text style={styles.ratingText}>{book.rate}/5</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.topRatedCard}>
-            <Image
-              source={require("../assets/Book1.jpg")}
-              style={styles.topRatedImage}
-            />
-            <View style={styles.ratingContainer}>
-              <Ionicons
-                name="star"
-                color={"gold"}
-                size={16}
-                style={styles.starIcon}
-              />
-              <Text style={styles.ratingText}>4.5</Text>
-            </View>
-          </View>
-          <View style={styles.topRatedCard}>
-            <Image
-              source={require("../assets/Book1.jpg")}
-              style={styles.topRatedImage}
-            />
-            <View style={styles.ratingContainer}>
-              <Ionicons
-                name="star"
-                color={"gold"}
-                size={16}
-                style={styles.starIcon}
-              />
-              <Text style={styles.ratingText}>4.5</Text>
-            </View>
-          </View>
-          <View style={styles.topRatedCard}>
-            <Image
-              source={require("../assets/Book1.jpg")}
-              style={styles.topRatedImage}
-            />
-            <View style={styles.ratingContainer}>
-              <Ionicons
-                name="star"
-                color={"gold"}
-                size={16}
-                style={styles.starIcon}
-              />
-              <Text style={styles.ratingText}>4.5</Text>
-            </View>
-          </View>
-
-          {/* Add more Top Rated Cards as needed */}
+          ))}
         </ScrollView>
       </View>
     </ScrollView>
   );
 };
 
-export default HomeScreen;
-
 const styles = StyleSheet.create({
-  enjoy: {
-    fontSize: 20,
-    color: "#FFB800",
-  },
   welcome_container: {
     paddingBottom: 25,
-    shadowColor: "#000", // Shadow color (for iOS)
-    shadowOffset: { width: 0, height: 2 }, // Shadow offset (for iOS)
-    shadowOpacity: 0.2, // Shadow opacity (for iOS)
-    shadowRadius: 2, // Shadow radius (for iOS)
-    elevation: 2, // Elevation (for Android)
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   welcome: {
     fontSize: 30,
     fontWeight: "bold",
     color: "#39CCCC",
+  },
+  enjoy: {
+    fontSize: 20,
+    color: "#FFB800",
   },
   header: {
     flex: 1,
@@ -248,6 +239,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  seeMoreButton: {
+    alignSelf: "flex-end",
+    marginTop: 10,
+    marginRight: 10,
+  },
+  seeMoreText: {
+    fontSize: 16,
+    color: "gray",
   },
   categoryContainer: {
     paddingVertical: 10,
@@ -288,15 +288,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 5,
   },
-  seeMoreButton: {
-    alignSelf: "flex-end",
-    marginTop: 10,
-    marginRight: 10,
-  },
-  seeMoreText: {
-    fontSize: 16, // Adjusted font size
-    color: "gray",
-  },
   // Top Rated Section styles
   topRatedContainer: {
     paddingVertical: 10,
@@ -305,8 +296,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 150,
     height: 200,
-    alignItems: "center", // Center elements vertically
-    justifyContent: "center", // Center elements horizontally
+    alignItems: "center",
+    justifyContent: "center",
   },
   topRatedImage: {
     width: "100%",
@@ -319,16 +310,17 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     paddingVertical: 5,
     paddingHorizontal: 10,
-    flexDirection: "row", // Display elements horizontally
-    alignItems: "center", // Center elements vertically
-  },
-  ratingContent: {
-    flexDirection: "row", // Display elements horizontally
-    alignItems: "center", // Center elements vertically
+    flexDirection: "row",
+    alignItems: "center",
   },
   ratingText: {
     color: "gold",
     fontWeight: "bold",
     fontSize: 12,
   },
+  starIcon: {
+    marginLeft: 5,
+  },
 });
+
+export default HomeScreen;
