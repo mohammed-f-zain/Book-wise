@@ -13,7 +13,8 @@ import ProfilePage from "./screens/ProfilePage";
 import TopRated from "./screens/TopRated";
 import BookDetails from "./screens/BookDetails";
 import CategoryBooksScreen from "./screens/CategoryBooksScreen";
-import { UserProvider } from "./contex/UserContext";
+import AuthorInfoScreen from "./screens/AuthorDetails";
+import { UserProvider } from "./context/UserContext";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,18 +61,35 @@ const App = () => {
   return (
     <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="FirstPage" headerMode="none">
-          <Stack.Screen name="FirstPage" component={FirstPage} />
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-          <Stack.Screen name="SigninScreen" component={SigninScreen} />
+        <Stack.Navigator initialRouteName="FirstPage">
+          <Stack.Screen
+            name="FirstPage"
+            component={FirstPage}
+            options={{ headerMode: "none" }}
+          />
+          <Stack.Screen
+            name="MainTabs"
+            component={MainTabs}
+            options={{ headerMode: "none" }}
+          />
+          <Stack.Screen
+            name="SigninScreen"
+            component={SigninScreen}
+            options={{ headerMode: "none" }}
+          />
           <Stack.Screen name="SearchPage" component={SearchPage} />
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen
+            name="Signup"
+            component={Signup}
+            options={{ headerMode: "none" }}
+          />
           <Stack.Screen name="FavPage" component={FavPage} />
           <Stack.Screen name="ProfilePage" component={ProfilePage} />
           <Stack.Screen name="TopRated" component={TopRated} />
           <Stack.Screen name="BookDetails" component={BookDetails} />
           <Stack.Screen name="CategoryBooks" component={CategoryBooksScreen} />
+          <Stack.Screen name="AuthorDetails" component={AuthorInfoScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

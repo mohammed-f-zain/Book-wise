@@ -16,6 +16,8 @@ const HomeScreen = () => {
 
   // State to store top-rated books
   const [topRatedBooks, setTopRatedBooks] = useState([]);
+  // State to store random authors
+  const [randomAuthors, setRandomAuthors] = useState([]);
 
   useEffect(() => {
     // Fetch top-rated books when the component mounts
@@ -31,11 +33,31 @@ const HomeScreen = () => {
       }
     };
 
+    // Fetch random authors when the component mounts
+    const fetchRandomAuthors = async () => {
+      try {
+        const response = await axios.get(
+          "https://book-wise-5tjm.onrender.com/author/list"
+        );
+        // Shuffle the array to get random authors
+        const shuffledAuthors = response.data.sort(() => 0.5 - Math.random());
+        const selectedAuthors = shuffledAuthors.slice(0, 4);
+        setRandomAuthors(selectedAuthors);
+      } catch (error) {
+        console.error("Error fetching random authors: ", error);
+      }
+    };
+
     fetchTopRatedBooks();
+    fetchRandomAuthors();
   }, []);
 
   const handleCategoryPress = (categoryName) => {
     navigation.navigate("CategoryBooks", { category: categoryName });
+  };
+
+  const handleAuthorPress = (authorId) => {
+    navigation.navigate("AuthorDetails", { authorId });
   };
 
   return (
@@ -125,42 +147,24 @@ const HomeScreen = () => {
             <Text style={styles.seeMoreText}>See More ...</Text>
           </TouchableOpacity>
         </View>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.authorContainer}
         >
-          <View style={styles.authorCard}>
-            <Image
-              source={require("../assets/AgathaChristie.jpg")}
-              style={styles.authorImage}
-            />
-            <Text style={styles.authorName}>Author 1</Text>
-          </View>
-          <View style={styles.authorCard}>
-            <Image
-              source={require("../assets/AgathaChristie.jpg")}
-              style={styles.authorImage}
-            />
-            <Text style={styles.authorName}>Author 1</Text>
-          </View>
-          <View style={styles.authorCard}>
-            <Image
-              source={require("../assets/AgathaChristie.jpg")}
-              style={styles.authorImage}
-            />
-            <Text style={styles.authorName}>Author 1</Text>
-          </View>
-          <View style={styles.authorCard}>
-            <Image
-              source={require("../assets/AgathaChristie.jpg")}
-              style={styles.authorImage}
-            />
-            <Text style={styles.authorName}>Author 1</Text>
-          </View>
-
-          {/* Add more Author Cards as needed */}
+          {randomAuthors.map((author) => (
+            <TouchableOpacity
+              key={author._id}
+              style={styles.authorCard}
+              onPress={() => handleAuthorPress(author._id)}
+            >
+              <Image
+                source={{ uri: author.image }}
+                style={styles.authorImage}
+              />
+              <Text style={styles.authorName}>{author.name}</Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
 

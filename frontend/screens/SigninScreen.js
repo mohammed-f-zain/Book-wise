@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUser } from "../contex/UserContext";
+import { useUser } from "../context/UserContext";
 import {
   StyleSheet,
   Text,
@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-
 
 const SigninScreen = () => {
   const { setToken, setUserId, token, userId } = useUser();
@@ -66,8 +65,8 @@ const SigninScreen = () => {
           // For example, you can navigate to the main screen.
           navigation.navigate("MainTabs");
           setEmail("");
-          console.log(token)
-          console.log(userId)
+          console.log(token);
+          console.log(userId);
         } else {
           // Handle sign-in error, such as displaying an error message.
           setPasswordError("Email or Password Not Correct");

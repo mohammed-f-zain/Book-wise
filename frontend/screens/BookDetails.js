@@ -1,57 +1,90 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Image, TextInput, Button, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+  Button,
+  ScrollView,
+} from "react-native";
 import axios from "axios";
 import { useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { useUser } from "../contex/UserContext";
+import { useUser } from "../context/UserContext";
 
 const BookDetails = () => {
   const [bookDetails, setBookDetails] = useState(null);
-  const [comment, setComment] = useState(""); // State to hold the user's comment
-  const [comments, setComments] = useState([]); // State to hold all comments
+  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState([]);
   const route = useRoute();
   const { setToken, setUserId, token, userId } = useUser();
   const { bookId } = route.params;
 
   useEffect(() => {
+    // Function to fetch username for a user ID
+    const getUsername = async (userId) => {
+      try {
+        const response = await axios.get(
+          `https://book-wise-5tjm.onrender.com/user/profile/${userId}`
+        );
+        return response.data.name;
+      } catch (error) {
+        console.error("Error fetching username:", error);
+        return "Unknown";
+      }
+    };
+
+    // Function to fetch comments and usernames
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(
+          `https://book-wise-5tjm.onrender.com/books/${bookId}`
+        );
+
+        const commentsWithUsernames = await Promise.all(
+          response.data.comments.map(async (comment) => {
+            const username = await getUsername(comment.user);
+            return { ...comment, username };
+          })
+        );
+
+        setComments(commentsWithUsernames);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
     // Fetch book details including comments
     axios
       .get(`https://book-wise-5tjm.onrender.com/books/${bookId}`)
       .then((response) => {
         setBookDetails(response.data);
+        // Fetch comments after fetching book details
+        fetchComments();
       })
       .catch((error) => console.error("Error fetching book data:", error));
-  }, [bookId]);
+  }, [comment]);
 
-  // Function to fetch username for a user ID
-  const getUsername = async (userId) => {
-    try {
-      const response = await axios.get(`https://book-wise-5tjm.onrender.com/user/profile/${userId}`);
-      return response.data.name;
-    } catch (error) {
-      console.error("Error fetching username:", error);
-      return "Unknown";
-    }
-  };
-
-  // Function to handle adding a comment
   const handleAddComment = async () => {
     if (comment.trim() !== "") {
       const newComment = {
         text: comment,
       };
 
-      // Send the comment to the server
       axios
-        .post(`https://book-wise-5tjm.onrender.com/user/comment/${bookId}`, newComment, {
-          headers: {
-            Authorization: token, // Replace with your static token
-          },
-        })
+        .post(
+          `https://book-wise-5tjm.onrender.com/user/comment/${bookId}`,
+          newComment,
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        )
         .then((response) => {
-          // Update the comments state with the new comment
           setComments([...comments, newComment]);
-          setComment(""); // Clear the input field
+          setComment("");
         })
         .catch((error) => console.error("Error adding comment:", error));
     }
@@ -69,7 +102,7 @@ const BookDetails = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Image source={{ uri: bookDetails.image }} style={styles.bookImage} />
       <Text style={styles.bookTitle}>{bookDetails.name}</Text>
-      <Text style={styles.bookAuthor}> {bookDetails.author}</Text>
+      <Text style={styles.bookAuthor}>{bookDetails.author}</Text>
       <Text style={styles.title}>Description :</Text>
       <Text style={styles.bookDescription}>{bookDetails.description}</Text>
       <Text style={styles.title}>Details :</Text>
@@ -80,19 +113,16 @@ const BookDetails = () => {
         </Text>
         <Text style={styles.categoryRateText}>
           <Text style={styles.boldText}>Rating:</Text> {bookDetails.rate}{" "}
-          <Ionicons name="star" color={"gold"} size={16} style={styles.starIcon} />
+          <Ionicons
+            name="star"
+            color={"gold"}
+            size={16}
+            style={styles.starIcon}
+          />
         </Text>
       </View>
       <View style={styles.commentsSection}>
         <Text style={styles.title}>Comments :</Text>
-        <ScrollView style={styles.commentsContainer}>
-          {comments.map((comment, index) => (
-            <View key={index} style={styles.commentItem}>
-              <Text style={styles.commentUsername}>{comment.name}</Text>
-              <Text style={styles.commentText}>{comment.text}</Text>
-            </View>
-          ))}
-        </ScrollView>
         <View style={styles.commentInputContainer}>
           <TextInput
             style={styles.commentInput}
@@ -100,8 +130,20 @@ const BookDetails = () => {
             value={comment}
             onChangeText={(text) => setComment(text)}
           />
-          <Button title="Add Comment" onPress={handleAddComment} />
+          <Button
+            style={styles.addCommentBtn}
+            title="Add Comment"
+            onPress={handleAddComment}
+          />
         </View>
+        <ScrollView style={styles.commentsContainer}>
+          {comments.map((comment, index) => (
+            <View key={index} style={styles.commentItem}>
+              <Text style={styles.commentUsername}>{comment.username}</Text>
+              <Text style={styles.commentText}>{comment.text}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     </ScrollView>
   );
@@ -110,11 +152,22 @@ const BookDetails = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    backgroundColor: "white",
   },
   loadingContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  commentUsername: {
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  commentItem: {
+    padding: 7,
+    backgroundColor: "#ddd",
+    marginTop: 10,
+    borderRadius: 16,
   },
   title: {
     fontWeight: "bold",
@@ -163,8 +216,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     backgroundColor: "#39cccc",
     padding: 15,
-    borderRadius: 5,
     color: "white",
+    borderRadius: 16,
   },
   boldText: {
     fontWeight: "bold",
@@ -194,6 +247,9 @@ const styles = StyleSheet.create({
   commentText: {
     fontSize: 16,
     marginBottom: 10,
+  },
+  addCommentBtn: {
+    backgroundColor: "#39ccc",
   },
 });
 

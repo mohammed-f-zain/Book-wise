@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // Updated import
+import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
-import { useUser } from "../contex/UserContext";
+import { useUser } from "../context/UserContext";
 
 const FavPage = () => {
   const [selectedOption, setSelectedOption] = useState("Read");

@@ -1,0 +1,54 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.loginPage {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='1920' height='1080' preserveAspectRatio='none' viewBox='0 0 1920 1080'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1303%26quot%3b)' fill='none'%3e%3crect width='1920' height='1080' x='0' y='0' fill='url(%26quot%3b%23SvgjsLinearGradient1304%26quot%3b)'%3e%3c/rect%3e%3cpath d='M1984 1080L0 1080 L0 474.11Q-31.36 346.75%2c 96 315.38Q125.48 248.86%2c 192 278.33Q247.56 173.89%2c 352 229.46Q437.26 154.72%2c 512 239.98Q621.88 253.87%2c 608 363.75Q763.01 358.76%2c 768 513.77Q778.32 364.09%2c 928 374.4Q981.79 268.19%2c 1088 321.97Q1208.82 282.79%2c 1248 403.6Q1341.93 401.54%2c 1344 495.47Q1399.85 391.32%2c 1504 447.17Q1562.66 409.84%2c 1600 468.5Q1654.5 427%2c 1696 481.51Q1709.3 398.81%2c 1792 412.1Q1810.64 334.75%2c 1888 353.39Q1896.87 266.25%2c 1984 275.12z' fill='%23182f5d'%3e%3c/path%3e%3cpath d='M1952 1080L0 1080 L0 606.93Q-12.98 497.95%2c 96 484.97Q127.53 420.5%2c 192 452.03Q308.47 408.5%2c 352 524.97Q387.74 464.71%2c 448 500.45Q483.66 440.11%2c 544 475.77Q652.68 424.45%2c 704 533.14Q769.19 438.33%2c 864 503.52Q920.48 400%2c 1024 456.48Q1119.22 391.71%2c 1184 486.93Q1351.35 494.27%2c 1344 661.62Q1457.88 615.5%2c 1504 729.39Q1536.2 665.59%2c 1600 697.79Q1634.77 572.56%2c 1760 607.32Q1731.78 483.1%2c 1856 454.88Q1893.34 396.22%2c 1952 433.56z' fill='%2325467d'%3e%3c/path%3e%3cpath d='M1952 1080L0 1080 L0 762.46Q34.9 701.37%2c 96 736.27Q115.21 659.48%2c 192 678.69Q230.6 621.29%2c 288 659.89Q353.85 629.74%2c 384 695.58Q508.75 724.33%2c 480 849.07Q471.97 681.04%2c 640 673.01Q707.67 580.68%2c 800 648.36Q886.69 639.05%2c 896 725.74Q1022.4 692.14%2c 1056 818.55Q1115.59 782.14%2c 1152 841.73Q1193.55 787.28%2c 1248 828.83Q1309.99 794.82%2c 1344 856.81Q1410.93 827.74%2c 1440 894.68Q1527.05 821.72%2c 1600 908.77Q1656.8 869.57%2c 1696 926.37Q1728.56 862.93%2c 1792 895.49Q1841.6 785.09%2c 1952 834.68z' fill='%23356cb1'%3e%3c/path%3e%3cpath d='M1984 1080L0 1080 L0 1044.75Q15.37 900.12%2c 160 915.49Q216.75 812.25%2c 320 869Q382.83 835.83%2c 416 898.66Q595.18 917.84%2c 576 1097.02Q571.59 996.61%2c 672 992.2Q745.51 905.71%2c 832 979.22Q841.34 892.56%2c 928 901.89Q969.55 847.44%2c 1024 889Q1126.39 831.39%2c 1184 933.79Q1377.95 967.74%2c 1344 1161.69Q1295.66 1017.36%2c 1440 969.02Q1458.11 891.13%2c 1536 909.24Q1577.66 854.9%2c 1632 896.56Q1705.01 873.57%2c 1728 946.57Q1914.51 973.09%2c 1888 1159.6Q1817.7 993.3%2c 1984 923z' fill='white'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1303'%3e%3crect width='1920' height='1080' fill='white'%3e%3c/rect%3e%3c/mask%3e%3clinearGradient x1='10.94%25' y1='-19.44%25' x2='89.06%25' y2='119.44%25' gradientUnits='userSpaceOnUse' id='SvgjsLinearGradient1304'%3e%3cstop stop-color='%230e2a47' offset='0'%3e%3c/stop%3e%3cstop stop-color='%2300459e' offset='1'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e");
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+}
+.loginPage img {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 30%;
+}
+input {
+  padding: 7px;
+  border-color: #39cccc;
+  border-radius: 16px;
+}
+label {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+button {
+  padding: 10px !important;
+  width: 10% !important;
+  border: #001f3f;
+  background-color: #39cccc;
+  color: white;
+  font-weight: bold;
+  font-size: 17px;
+  cursor: pointer;
+  border-radius: 16px !important;
+}
+button:hover {
+  opacity: 60%;
+  transition: 0.5s;
+}
+.error {
+  color: red;
+  text-align: center;
+}
