@@ -1,22 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
 import "./books.css";
+import FileBase from "react-file-base64";
+
+const categories = [
+  "Comedy",
+  "Thriller",
+  "Romance",
+  "Biography",
+  "Historical",
+  "Motivation",
+  "Kids",
+  // Add more categories as needed
+];
 
 const EditBookModal = ({ show, handleClose, bookData, onUpdate }) => {
   const [updatedData, setUpdatedData] = useState({ ...bookData });
 
+  // Update the local state when bookData prop changes
+  useEffect(() => {
+    setUpdatedData({ ...bookData });
+  }, [bookData]);
+
   const handleUpdate = () => {
-    const token = localStorage.getItem("token"); // Replace with your actual token key
+    const token = localStorage.getItem("token");
 
     if (!token) {
-      // Handle the case where the token is not found in local storage
       console.error("Authentication token not found in local storage");
       return;
     }
 
-    // Send the updated data to the server
     axios
       .patch(
         `https://book-wise-5tjm.onrender.com/books/${bookData._id}`,
@@ -28,8 +43,8 @@ const EditBookModal = ({ show, handleClose, bookData, onUpdate }) => {
         }
       )
       .then(() => {
-        onUpdate(updatedData); // Notify the parent component that the book was updated
-        handleClose(); // Close the modal
+        onUpdate(updatedData);
+        handleClose();
       })
       .catch((error) => {
         console.error("Error updating book:", error);
@@ -91,22 +106,28 @@ const EditBookModal = ({ show, handleClose, bookData, onUpdate }) => {
           </div>
           <div className="form-group">
             <label>Category:</label>
-            <input
-              type="text"
+            <select
               name="category"
               value={updatedData.category}
               onChange={handleInputChange}
               className="form-control"
-            />
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
-            <label>Image URL:</label>
-            <input
-              type="text"
-              name="image"
-              value={updatedData.image}
-              onChange={handleInputChange}
-              className="form-control"
+          <label>Image:</label>
+            <FileBase
+              type="file"
+              multiple={false}
+              onDone={({ base64 }) =>
+                handleInputChange({ target: { name: "image", value: base64 } })
+              }
             />
           </div>
         </form>

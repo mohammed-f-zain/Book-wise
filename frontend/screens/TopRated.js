@@ -7,34 +7,29 @@ import { useNavigation } from "@react-navigation/native";
 const TopRated = () => {
   const [bookData, setBookData] = useState([]);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
-
   const navigation = useNavigation();
 
   useEffect(() => {
-    axios
-      .get("https://book-wise-5tjm.onrender.com/books/list")
-      .then((response) => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("https://book-wise-5tjm.onrender.com/books/list");
         const sortedData = response.data.sort((a, b) => b.rate - a.rate);
         setBookData(sortedData);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const toggleDropdown = (index) => {
-    if (openDropdownIndex === index) {
-      setOpenDropdownIndex(null);
-    } else {
-      setOpenDropdownIndex(index);
-    }
+    setOpenDropdownIndex((prevIndex) => (prevIndex === index ? null : index));
   };
 
   const handleBookPress = (item) => {
     navigation.navigate("BookDetails", { bookId: item._id });
-    console.log(item._id) // Pass bookId to BookDetails page
-  };
-
-  const handleOptionClick = (item, option) => {
-    // Your existing code for handling options goes here...
+    console.log(item._id); // Pass bookId to BookDetails page
   };
 
   const renderBookCard = ({ item, index }) => (
@@ -45,19 +40,11 @@ const TopRated = () => {
           <Text style={styles.bookTitle}>{item.name}</Text>
           <Text style={styles.bookAuthor}>{item.author}</Text>
           <View style={styles.ratingContainer}>
-            <Ionicons
-              name="star"
-              color={"gold"}
-              size={16}
-              style={styles.starIcon}
-            />
+            <Ionicons name="star" color={"gold"} size={16} style={styles.starIcon} />
             <Text style={styles.ratingText}>{item.rate}</Text>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => toggleDropdown(index)}
-          style={styles.dropdownButton}
-        >
+        <TouchableOpacity onPress={() => toggleDropdown(index)} style={styles.dropdownButton}>
           <Ionicons
             name={item.status === "none" ? "ios-add-circle-outline" : item.icon}
             color={item.status === "none" ? "blue" : "green"}
@@ -65,25 +52,6 @@ const TopRated = () => {
           />
         </TouchableOpacity>
       </TouchableOpacity>
-      {openDropdownIndex === index && (
-        <View style={[styles.dropdownMenu, { zIndex: 1 }]}>
-          <TouchableOpacity
-            onPress={() => handleOptionClick(item, "bookmark-outline")}
-          >
-            <Text style={styles.menuOptions}>Option 1</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleOptionClick(item, "checkmark-done-outline")}
-          >
-            <Text style={styles.menuOptions}>Option 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleOptionClick(item, "timer-outline")}
-          >
-            <Text style={styles.menuOptions}>Option 3</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 
@@ -120,7 +88,8 @@ const styles = StyleSheet.create({
   topRatedImage: {
     width: 100,
     height: 150,
-    objectFit: "fit",
+    objectFit: "cover",
+    borderRadius: 16,
   },
   cardContent: {
     flexDirection: "row",
@@ -130,31 +99,19 @@ const styles = StyleSheet.create({
   bookDetails: {
     flex: 1,
     marginLeft: 10,
+    gap: 20,
   },
   bookTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
   },
   bookAuthor: {
-    fontSize: 12,
+    fontSize: 16,
     color: "gray",
   },
-  dropdownButton: {
-    padding: 10,
-  },
-  dropdownMenu: {
-    position: "absolute",
-    top: 90,
-    right: 40,
-    backgroundColor: "white",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    zIndex: 1,
-  },
-  menuOptions: {
-    padding: 16,
+  ratingContainer: {
+    flexDirection: "row",
+    gap: 6,
   },
 });
 

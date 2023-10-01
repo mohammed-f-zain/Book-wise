@@ -17,6 +17,7 @@ const BookDetails = () => {
   const [bookDetails, setBookDetails] = useState(null);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [rating, setRating] = useState(0); // New state for user's rating
   const route = useRoute();
   const { setToken, setUserId, token, userId } = useUser();
   const { bookId } = route.params;
@@ -64,7 +65,7 @@ const BookDetails = () => {
         fetchComments();
       })
       .catch((error) => console.error("Error fetching book data:", error));
-  }, [comment]);
+  }, [bookDetails]);
 
   const handleAddComment = async () => {
     if (comment.trim() !== "") {
@@ -87,6 +88,32 @@ const BookDetails = () => {
           setComment("");
         })
         .catch((error) => console.error("Error adding comment:", error));
+    }
+  };
+
+  const handleAddRating = async () => {
+    if (rating >= 1 && rating <= 5) {
+      const newRating = {
+        rating: rating,
+      };
+
+      axios
+        .post(
+          `https://book-wise-5tjm.onrender.com/user/rate/${bookId}`,
+          newRating,
+          {
+            headers: {
+              Authorization: token,
+            },
+          }
+        )
+        .then((response) => {
+          // Handle the response (if needed)
+          console.log("Rating submitted successfully!");
+        })
+        .catch((error) => console.error("Error adding rating:", error));
+    } else {
+      console.error("Invalid rating. Please enter a rating from 1 to 5.");
     }
   };
 
@@ -152,7 +179,7 @@ const BookDetails = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "white",
+    backgroundColor: "",
   },
   loadingContainer: {
     flex: 1,
@@ -171,7 +198,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "bold",
-    fontSize: 22,
+    fontSize: 20,
     textAlign: "left",
     marginTop: 10,
   },
@@ -180,15 +207,16 @@ const styles = StyleSheet.create({
     height: 300,
     resizeMode: "cover",
     alignSelf: "center",
+    borderRadius: 16,
   },
   bookTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginVertical: 10,
     alignSelf: "center",
   },
   bookAuthor: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 5,
     color: "#39cccc",
     alignSelf: "center",
@@ -217,7 +245,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#39cccc",
     padding: 15,
     color: "white",
-    borderRadius: 16,
   },
   boldText: {
     fontWeight: "bold",
@@ -250,6 +277,19 @@ const styles = StyleSheet.create({
   },
   addCommentBtn: {
     backgroundColor: "#39ccc",
+  },
+  ratingInputContainer: {
+    marginTop: 20,
+    display: "flex",
+    flexDirection: "row",
+  },
+  ratingInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
   },
 });
 

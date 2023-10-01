@@ -14,6 +14,7 @@ import TopRated from "./screens/TopRated";
 import BookDetails from "./screens/BookDetails";
 import CategoryBooksScreen from "./screens/CategoryBooksScreen";
 import AuthorInfoScreen from "./screens/AuthorDetails";
+import RateBook from "./screens/RateBook";
 import { UserProvider } from "./context/UserContext";
 
 const Stack = createStackNavigator();
@@ -34,18 +35,17 @@ const MainTabs = () => {
           } else if (route.name === "Favorite") {
             iconName = focused ? "heart" : "heart-outline";
           } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
+            iconName = focused ? "person" : "cog-outline";
           } else if (route.name === "Trending") {
             iconName = focused ? "trending-up" : "trending-up-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#FFB800", // Active tab color
-        tabBarInactiveTintColor: "#39CCCC", // Inactive tab color
+        tabBarActiveTintColor: "#FFB800",
+        tabBarInactiveTintColor: "#39CCCC",
         tabBarLabelStyle: null,
         headerShown: false,
-        // Tab label style
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -90,6 +90,7 @@ const App = () => {
           <Stack.Screen name="BookDetails" component={BookDetails} />
           <Stack.Screen name="CategoryBooks" component={CategoryBooksScreen} />
           <Stack.Screen name="AuthorDetails" component={AuthorInfoScreen} />
+          <Stack.Screen name="RateBook" component={RateBook} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

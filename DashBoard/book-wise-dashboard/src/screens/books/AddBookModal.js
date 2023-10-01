@@ -1,10 +1,19 @@
-
 import React, { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
 import FileBase from "react-file-base64";
 
+const categories = [
+  "Comedy",
+  "Thriller",
+  "Romance",
+  "Biography",
+  "Historical",
+  "Motivation",
+  "Kids",
+  // Add more categories as needed
+];
 
 const AddNewBookModal = ({ show, handleClose, onAdd }) => {
   const [newBookData, setNewBookData] = useState({
@@ -12,20 +21,18 @@ const AddNewBookModal = ({ show, handleClose, onAdd }) => {
     author: "",
     description: "",
     details: "",
-    category: "",
+    category: "", // Initialize category as an empty string
     image: "",
   });
 
   const handleAdd = () => {
-    const token = localStorage.getItem("token"); // Replace with your actual token key
+    const token = localStorage.getItem("token");
 
     if (!token) {
-      // Handle the case where the token is not found in local storage
       console.error("Authentication token not found in local storage");
       return;
     }
 
-    // Send the new book data to the server
     axios
       .post("https://book-wise-5tjm.onrender.com/books/create", newBookData, {
         headers: {
@@ -33,12 +40,13 @@ const AddNewBookModal = ({ show, handleClose, onAdd }) => {
         },
       })
       .then((response) => {
-        onAdd(response.data); // Notify the parent component that a new book was added
-        handleClose(); // Close the modal
+        onAdd(response.data);
+        handleClose();
       })
       .catch((error) => {
         console.error("Error adding new book:", error);
       });
+      setNewBookData({})
   };
 
   const handleInputChange = (event) => {
@@ -96,25 +104,22 @@ const AddNewBookModal = ({ show, handleClose, onAdd }) => {
           </div>
           <div className="form-group">
             <label>Category:</label>
-            <input
-              type="text"
+            <select
               name="category"
               value={newBookData.category}
               onChange={handleInputChange}
               className="form-control"
-            />
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
-          {/* <div className="form-group">
-            <label>Image URL:</label>
-            <input
-              type="text"
-              name="image"
-              value={newBookData.image}
-              onChange={handleInputChange}
-              className="form-control"
-            />
-          </div> */}
-          <div>
+          <div className="form-group">
+          <label>Image:</label>
             <FileBase
               type="file"
               multiple={false}

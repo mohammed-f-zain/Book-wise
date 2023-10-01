@@ -10,36 +10,33 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import { useUser } from "../context/UserContext";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const { userId } = useUser();
 
-  // State to store top-rated books
   const [topRatedBooks, setTopRatedBooks] = useState([]);
-  // State to store random authors
   const [randomAuthors, setRandomAuthors] = useState([]);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Fetch top-rated books when the component mounts
     const fetchTopRatedBooks = async () => {
       try {
         const response = await axios.get(
           "https://book-wise-5tjm.onrender.com/books/list"
         );
-        // Assuming the response data is an array of top-rated books
         setTopRatedBooks(response.data);
       } catch (error) {
         console.error("Error fetching top-rated books: ", error);
       }
     };
 
-    // Fetch random authors when the component mounts
     const fetchRandomAuthors = async () => {
       try {
         const response = await axios.get(
           "https://book-wise-5tjm.onrender.com/author/list"
         );
-        // Shuffle the array to get random authors
         const shuffledAuthors = response.data.sort(() => 0.5 - Math.random());
         const selectedAuthors = shuffledAuthors.slice(0, 4);
         setRandomAuthors(selectedAuthors);
@@ -48,9 +45,25 @@ const HomeScreen = () => {
       }
     };
 
+    const fetchUserName = async () => {
+      try {
+        const response = await axios.get(
+          `https://book-wise-5tjm.onrender.com/user/profile/${userId}`
+        );
+        setUserName(response.data.name);
+      } catch (error) {
+        console.error("Error fetching user's name: ", error);
+      }
+    };
+
     fetchTopRatedBooks();
     fetchRandomAuthors();
-  }, []);
+    fetchUserName();
+  }, [userId]);
+
+  const handleBookPress = (item) => {
+    navigation.navigate("BookDetails", { bookId: item._id });
+  };
 
   const handleCategoryPress = (categoryName) => {
     navigation.navigate("CategoryBooks", { category: categoryName });
@@ -62,153 +75,113 @@ const HomeScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.welcome_container}>
-        <Text style={styles.welcome}>Hi Saeed</Text>
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcome}>Hi {userName}</Text>
         <Text style={styles.enjoy}>Enjoy Your Reading Today</Text>
       </View>
 
-      {/* Categories Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Categories</Text>
+      <Section title="Categories">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoryContainer}
         >
-          {/* Category Card 1 */}
-          <TouchableOpacity
-            style={styles.categoryCard}
-            onPress={() => handleCategoryPress("Comedy")}
-          >
-            <Image
-              source={require("../assets/Comedy.png")}
-              style={styles.categoryImage}
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.name}
+              category={category}
+              onPress={handleCategoryPress}
             />
-            <Text style={styles.categoryTitle}>Comedy</Text>
-          </TouchableOpacity>
-
-          {/* Category Card 2 */}
-          <TouchableOpacity style={styles.categoryCard}  onPress={() => handleCategoryPress("Thriller")}>
-            <Image
-              source={require("../assets/Mystery.png")}
-              style={styles.categoryImage}
-             
-            />
-            <Text style={styles.categoryTitle}>Thriller</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}  onPress={() => handleCategoryPress("Romance")}>
-            <Image
-              source={require("../assets/Romance.png")}
-              style={styles.categoryImage}
-            />
-            <Text style={styles.categoryTitle}>Romance</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Biography")}>
-            <Image
-              source={require("../assets/Biography.png")}
-              style={styles.categoryImage}
-            />
-            <Text style={styles.categoryTitle}>Biography</Text>
-          </TouchableOpacity>
-
-
-          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Historical")} >
-            <Image
-              source={require("../assets/Historical.png")}
-              style={styles.categoryImage}
-            />
-            <Text style={styles.categoryTitle}>Historical</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Motivation")}>
-            <Image
-              source={require("../assets/Self-confident.png")}
-              style={styles.categoryImage}
-            />
-            <Text style={styles.categoryTitle}>Motivation</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryCard} onPress={() => handleCategoryPress("Kids")}>
-            <Image
-              source={require("../assets/kids.png")}
-              style={styles.categoryImage}
-            />
-            <Text style={styles.categoryTitle}>Kids</Text>
-          </TouchableOpacity>
-          {/* Add more Category Cards as needed */}
+          ))}
         </ScrollView>
-      </View>
+      </Section>
 
-      {/* Popular Authors Section */}
-      <View style={styles.section}>
-        <View style={styles.header}>
-          <Text style={styles.sectionTitle}>Popular Authors</Text>
-          <TouchableOpacity style={styles.seeMoreButton}>
-            <Text style={styles.seeMoreText}>See More ...</Text>
-          </TouchableOpacity>
-        </View>
+      <Section title="Popular Authors" onPress={() => navigation.navigate("AllAuthors")}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.authorContainer}
         >
           {randomAuthors.map((author) => (
-            <TouchableOpacity
-              key={author._id}
-              style={styles.authorCard}
-              onPress={() => handleAuthorPress(author._id)}
-            >
-              <Image
-                source={{ uri: author.image }}
-                style={styles.authorImage}
-              />
-              <Text style={styles.authorName}>{author.name}</Text>
-            </TouchableOpacity>
+            <AuthorCard key={author._id} author={author} onPress={handleAuthorPress} />
           ))}
         </ScrollView>
-      </View>
+      </Section>
 
-      {/* Top Rated Section */}
-      <View style={styles.section}>
-        <View style={styles.header}>
-          <Text style={styles.sectionTitle}>Top Rated</Text>
-          <TouchableOpacity
-            style={styles.seeMoreButton}
-            onPress={() => navigation.navigate("TopRated")}
-          >
-            <Text style={styles.seeMoreText}>See More ...</Text>
-          </TouchableOpacity>
-        </View>
+      <Section title="Top Rated" onPress={() => navigation.navigate("TopRated")}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.topRatedContainer}
         >
-          {topRatedBooks.map((book, index) => (
-            <View style={styles.topRatedCard} key={index}>
-              <Image
-                source={{ uri: book.image }} // Use the book's image URL
-                style={styles.topRatedImage}
-              />
-              <View style={styles.ratingContainer}>
-                <Ionicons
-                  name="star"
-                  color={"gold"}
-                  size={16}
-                  style={styles.starIcon}
-                />
-                <Text style={styles.ratingText}>{book.rate}/5</Text>
-              </View>
-            </View>
+          {topRatedBooks.map((book) => (
+            <TopRatedCard key={book._id} book={book} onPress={handleBookPress} />
           ))}
         </ScrollView>
-      </View>
+      </Section>
     </ScrollView>
   );
 };
 
+const Section = ({ title, children, onPress }) => (
+  <View style={styles.section}>
+    <View style={styles.header}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <TouchableOpacity style={styles.seeMoreButton} onPress={onPress}>
+        <Text style={styles.seeMoreText}>See More ...</Text>
+      </TouchableOpacity>
+    </View>
+    {children}
+  </View>
+);
+
+const CategoryCard = ({ category, onPress }) => (
+  <TouchableOpacity
+    style={styles.categoryCard}
+    onPress={() => onPress(category.name)}
+  >
+    <Image source={category.image} style={styles.categoryImage} />
+    <Text style={styles.categoryTitle}>{category.name}</Text>
+  </TouchableOpacity>
+);
+
+const AuthorCard = ({ author, onPress }) => (
+  <TouchableOpacity
+    key={author._id}
+    style={styles.authorCard}
+    onPress={() => onPress(author._id)}
+  >
+    <Image source={{ uri: author.image }} style={styles.authorImage} />
+    <Text style={styles.authorName}>{author.name}</Text>
+  </TouchableOpacity>
+);
+
+const TopRatedCard = ({ book, onPress }) => (
+  <TouchableOpacity
+    style={styles.topRatedCard}
+    onPress={() => onPress(book)}
+  >
+    <Image source={{ uri: book.image }} style={styles.topRatedImage} />
+    <View style={styles.ratingContainer}>
+      <Ionicons name="star" color={"gold"} size={16} style={styles.starIcon} />
+      <Text style={styles.ratingText}>{book.rate}/5</Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const categories = [
+  { name: "Comedy", image: require("../assets/Comedy.png") },
+  { name: "Thriller", image: require("../assets/Mystery.png") },
+  { name: "Romance", image: require("../assets/Romance.png") },
+  { name: "Biography", image: require("../assets/Biography.png") },
+  { name: "Historical", image: require("../assets/Historical.png") },
+  { name: "Motivation", image: require("../assets/Self-confident.png") },
+  { name: "Kids", image: require("../assets/kids.png") },
+  // Add more categories as needed
+];
+
 const styles = StyleSheet.create({
-  welcome_container: {
+  welcomeContainer: {
     paddingBottom: 25,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -275,7 +248,6 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: "center",
   },
-  // Author Section styles
   authorContainer: {
     paddingVertical: 10,
   },
@@ -292,7 +264,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 5,
   },
-  // Top Rated Section styles
   topRatedContainer: {
     paddingVertical: 10,
   },
