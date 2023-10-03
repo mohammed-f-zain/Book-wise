@@ -36,6 +36,7 @@ const AddNewAuthorModal = ({ show, handleClose, onAdd }) => {
       .then((response) => {
         onAdd(response.data);
         handleClose();
+        setNewAuthorData({});
       })
       .catch((error) => {
         console.error("Error adding new author:", error);
@@ -116,7 +117,8 @@ const AddNewAuthorModal = ({ show, handleClose, onAdd }) => {
               className="form-control"
             />
           </div> */}
-          <div>
+          <div className="form-group">
+            <label>Image :</label>
             <FileBase
               type="file"
               multiple={false}

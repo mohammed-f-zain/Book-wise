@@ -1,13 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
+import "./author.css";
+import FileBase from "react-file-base64";
 
 const EditAuthorModal = ({ show, handleClose, authorData, onUpdate }) => {
-  const [updatedAuthor, setUpdatedAuthor] = useState(authorData || {});
+  const [updatedAuthor, setUpdatedAuthor] = useState({ ...authorData });
+
+  // Update the local state when authorData prop changes
+  useEffect(() => {
+    setUpdatedAuthor({ ...authorData });
+  }, [authorData]);
 
   const handleUpdate = () => {
-    const token = localStorage.getItem("token"); // Get the token from local storage
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.error("Authentication token not found in local storage");
+      return;
+    }
 
     axios
       .patch(
@@ -15,17 +27,25 @@ const EditAuthorModal = ({ show, handleClose, authorData, onUpdate }) => {
         updatedAuthor,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the request headers
+            Authorization: `Bearer ${token}`,
           },
         }
       )
       .then(() => {
-        onUpdate(updatedAuthor); // Notify the parent component that the author was updated
-        handleClose(); // Close the modal
+        onUpdate(updatedAuthor);
+        handleClose();
       })
       .catch((error) => {
         console.error("Error updating author:", error);
       });
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setUpdatedAuthor((prevAuthor) => ({
+      ...prevAuthor,
+      [name]: value,
+    }));
   };
 
   return (
@@ -34,66 +54,67 @@ const EditAuthorModal = ({ show, handleClose, authorData, onUpdate }) => {
         <Modal.Title>Edit Author</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {updatedAuthor && (
-          <>
-            {/* Create form fields for editing author data */}
+        <form>
+          <div className="form-group">
+            <label>Name:</label>
             <input
               type="text"
-              value={updatedAuthor.name || ""}
-              onChange={(e) =>
-                setUpdatedAuthor({ ...updatedAuthor, name: e.target.value })
-              }
-              placeholder="Author Name"
+              name="name"
+              value={updatedAuthor.name}
+              onChange={handleInputChange}
+              className="form-control"
             />
+          </div>
+          <div className="form-group">
+            <label>Age:</label>
             <input
               type="text"
-              value={updatedAuthor.age || ""}
-              onChange={(e) =>
-                setUpdatedAuthor({ ...updatedAuthor, age: e.target.value })
-              }
-              placeholder="Age"
+              name="age"
+              value={updatedAuthor.age}
+              onChange={handleInputChange}
+              className="form-control"
             />
+          </div>
+          <div className="form-group">
+            <label>Country:</label>
             <input
               type="text"
-              value={updatedAuthor.country || ""}
-              onChange={(e) =>
-                setUpdatedAuthor({ ...updatedAuthor, country: e.target.value })
-              }
-              placeholder="Country"
+              name="country"
+              value={updatedAuthor.country}
+              onChange={handleInputChange}
+              className="form-control"
             />
+          </div>
+          <div className="form-group">
+            <label>Writing Type:</label>
             <input
               type="text"
-              value={updatedAuthor.writingType || ""}
-              onChange={(e) =>
-                setUpdatedAuthor({
-                  ...updatedAuthor,
-                  writingType: e.target.value,
-                })
-              }
-              placeholder="Writing Type"
+              name="writingType"
+              value={updatedAuthor.writingType}
+              onChange={handleInputChange}
+              className="form-control"
             />
-            <input
-              type="text"
-              value={updatedAuthor.lifeAndCareer || ""}
-              onChange={(e) =>
-                setUpdatedAuthor({
-                  ...updatedAuthor,
-                  lifeAndCareer: e.target.value,
-                })
-              }
-              placeholder="Life and Career"
+          </div>
+          <div className="form-group">
+            <label>Life and Career:</label>
+            <textarea
+              name="lifeAndCareer"
+              value={updatedAuthor.lifeAndCareer}
+              onChange={handleInputChange}
+              className="form-control"
             />
-            <input
-              type="text"
-              value={updatedAuthor.image || ""}
-              onChange={(e) =>
-                setUpdatedAuthor({ ...updatedAuthor, image: e.target.value })
+          </div>
+          <div className="form-group">
+            <label>Image :</label>
+            <FileBase
+              type="file"
+              multiple={false}
+              onDone={({ base64 }) =>
+                handleInputChange({ target: { name: "image", value: base64 } })
               }
-              placeholder="Image URL"
             />
-            {/* Add more fields for other author data */}
-          </>
-        )}
+          </div>
+        </form>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
